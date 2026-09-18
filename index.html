@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Monitor</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#182234;font-family:Arial,"Noto Sans KR",sans-serif}
+.shell{min-height:100vh;display:flex}.sidebar{width:240px;background:#101827;color:white;padding:26px 16px;display:flex;flex-direction:column}
+.brand{display:flex;gap:11px;align-items:center;padding:0 10px 35px}.brand>b{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#7dd3fc,#a78bfa);font-size:20px}
+.brand strong,.brand small{display:block}.brand small{color:#8795ab;font-size:10px;margin-top:4px}.sidebar nav button{display:block;width:100%;text-align:left;background:none;color:#91a0b7;padding:12px;border-radius:9px;margin:3px 0;border:0;font-size:13px;cursor:pointer}
+.sidebar nav .active,.sidebar nav button:hover{background:#1c283a;color:#fff}.sidebar footer{margin-top:auto;color:#8491a7;font-size:11px;padding:10px}.sidebar footer small{display:block;margin-top:8px;color:#647187}
+.content{flex:1;padding:34px 42px;overflow:auto}header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:27px}
+header label,.modal label{font-size:10px;font-weight:800;letter-spacing:.14em;color:#8d98a9}h1{font-size:28px;margin:7px 0 5px;letter-spacing:-.04em}header p{margin:0;color:#7f8999;font-size:13px}
+.live{font-size:11px;color:#697589}.live i{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#e2e9fb;color:#536ba7;font-style:normal}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.card,.panel{background:#fff;border:1px solid #e7ebf2;border-radius:15px;box-shadow:0 3px 14px #15203308}
+.card{padding:19px 20px}.card>span{font-size:12px;color:#7d8798}.card strong{display:block;font-size:27px;margin-top:6px}.card strong small{font-size:12px;font-weight:400;color:#929bab;margin-left:4px}.card em{display:block;font-style:normal;color:#a0a8b5;font-size:10px;margin-top:6px}
+.blue{border-top:3px solid #9bd2f0}.purple{border-top:3px solid #b9a8ee}.green{border-top:3px solid #9ad7ba}.red{border-top:3px solid #e7a4a4}
+.panel{overflow:hidden}.head{padding:19px 21px;border-bottom:1px solid #edf0f4;display:flex;justify-content:space-between;align-items:center}.head h2{font-size:15px;margin:0 0 4px}.head span{font-size:10px;color:#9aa3b1}
+.filters{display:flex;gap:5px}.filters button{border:0;background:#f3f5f8;color:#7e8999;padding:7px 10px;border-radius:8px;font-size:10px;cursor:pointer}.filters .sel{background:#1d293b;color:#fff}
+table{width:100%;border-collapse:collapse;font-size:11px}th{background:#fbfcfd;color:#99a2b0;font-size:10px;text-align:left;padding:12px 15px}td{padding:14px 15px;border-top:1px solid #f0f2f5;color:#536074}tbody tr{cursor:pointer}tbody tr:hover{background:#fafbfe}
+td b{display:block;color:#263247}td small{display:block;color:#a0a8b5;font-size:9px;margin-top:4px}.mono{font-family:Consolas,monospace;font-size:10px}
+.badge{display:inline-block;padding:5px 9px;border-radius:99px;font-style:normal;font-weight:700;font-size:9px}.running{background:#e4f3ff;color:#3887bb}.success{background:#e4f7ed;color:#3e9a71}.failed{background:#ffebeb;color:#c96767}.cancelled{background:#f0f1f3;color:#7c8491}
+.bottom{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;margin-top:20px}.system{padding:12px 21px}.system>b{font-size:11px}.system>span{float:right;color:#939cab;font-size:10px}.system>div{height:5px;background:#edf0f4;border-radius:9px;margin-top:8px}.system i{display:block;height:100%;background:#91a9e7;border-radius:9px}
+.collector-body{padding:24px 21px}.collector-body strong{font-size:13px}.collector-body p{font-size:10px;color:#929baa}.next{margin:0 21px 20px;padding:11px;background:#f7f8fa;color:#8c95a4;font-size:10px;border-radius:8px}.next b{color:#56637a}
+.back{position:fixed;inset:0;background:#11182766;backdrop-filter:blur(3px);display:grid;place-items:center;padding:20px;z-index:10}.modal{position:relative;width:min(700px,100%);background:white;border-radius:18px;padding:25px;box-shadow:0 20px 70px #11182730}.modal h2{margin:7px 0 20px}.close{position:absolute;right:20px;top:20px;border:0;background:#f2f4f7;border-radius:8px;font-size:20px;width:30px;height:30px;cursor:pointer}
+.details{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px}.details span{font-size:9px;color:#98a2b0}.details b{display:block;color:#273247;font-size:10px;margin-top:6px}.modal h3{font-size:12px;display:flex;justify-content:space-between}.stages{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.stages div{padding:13px 5px;text-align:center;border:1px solid #e7ebf0;border-radius:9px;color:#a0a8b4;font-size:10px}.stages b{display:block;margin-top:6px;font-size:9px}.stages .done{background:#f1fbf6;border-color:#d9eee3;color:#479876}.stages .fail{background:#fff2f2;border-color:#f0d2d2;color:#c96666}.modal pre{margin:20px 0 0;background:#111827;color:#aeb9ca;border-radius:10px;padding:15px;font:10px/1.8 Consolas,monospace;white-space:pre-wrap}
+@media(max-width:900px){.sidebar{display:none}.content{padding:22px}.stats{grid-template-columns:1fr 1fr}.bottom{grid-template-columns:1fr}.filters{display:none}.details{grid-template-columns:1fr 1fr}}
+
+.env{display:inline-block;padding:4px 7px;border-radius:6px;font-style:normal;font-size:9px;font-weight:700}
+.env.개발{background:#f0ecff;color:#7562b4}.env.테스트{background:#e8f5ff;color:#3984b0}.env.운영{background:#e8f7ed;color:#3e926c}
+table{table-layout:fixed}th:nth-child(1){width:15%}th:nth-child(2){width:8%}th:nth-child(3){width:17%}th:nth-child(4){width:9%}th:nth-child(5){width:14%}th:nth-child(6){width:8%}th:nth-child(7){width:12%}th:nth-child(8){width:9%}
+td,th{white-space:nowrap}td{padding:9px 12px;font-size:10px}th{padding:9px 12px}.panel .head{padding:16px 20px}
+</style>
+<style>
+/* Build Monitor v2 operational dashboard */
+.ops-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 14px}
+.ops-card{background:#151a23;border:1px solid #252c38;border-radius:10px;padding:12px 14px;min-height:72px}
+.ops-card .label{font-size:12px;color:#8d98aa}.ops-card .num{font-size:24px;font-weight:750;margin-top:5px}.ops-card.warn .num{color:#ffb84d}.ops-card.danger .num{color:#ff6b6b}
+.attention{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.att-box{background:#151a23;border:1px solid #252c38;border-radius:10px;padding:12px 14px}.att-title{font-weight:700;font-size:13px;margin-bottom:8px}.att-item{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #252c38;font-size:12px}.att-item:first-of-type{border-top:0}.att-meta{color:#8d98aa}.owner{font-weight:700}
+.mini-schedule{margin-top:14px;background:#151a23;border:1px solid #252c38;border-radius:10px;padding:12px 14px}.mini-schedule h3{font-size:13px;margin:0 0 8px}.schedule-row{display:grid;grid-template-columns:1.5fr .6fr .8fr .8fr .7fr;gap:8px;padding:7px 0;border-top:1px solid #252c38;font-size:12px}.schedule-row.head{color:#8d98aa;border-top:0}.schedule-ok{color:#6ee7a0}.schedule-warn{color:#ffb84d}
+.status{display:inline-flex;align-items:center;gap:5px}.status.wait{color:#f4c95d}.status.run{color:#6bb7ff}.status.success{color:#6ee7a0}.status.fail{color:#ff6b6b}.status.cancel{color:#aab3c2}
+.env.dev{background:#33265d;color:#cdb8ff}.env.test{background:#163c5b;color:#8fd0ff}.env.prod{background:#16452f;color:#85e0ad}
+.owner.infra{color:#ffb84d}.owner.sm{color:#8fd0ff}
+@media(max-width:900px){.ops-summary{grid-template-columns:repeat(2,1fr)}.attention{grid-template-columns:1fr}.schedule-row{grid-template-columns:1.4fr .6fr .8fr .8fr}}
+</style>
+
+</head>
+<body>
+<main class="shell">
+<aside class="sidebar">
+<div class="brand"><b>B</b><div><strong>Build Monitor</strong><small>BuildForge Operations</small></div></div>
+<nav>
+<button class="active">▦　대시보드</button><button>↻　배포 이력</button><button>▣　시스템 현황</button><button>⚙　설정</button>
+</nav>
+<footer>● Collector 연결 대기중<br><small>UI Preview · Dummy Data</small></footer>
+</aside>
+
+<section class="content">
+<header>
+<div><label>OPERATIONS / DEPLOYMENT</label><h1>배포 현황</h1><p>BuildForge 배포 작업을 한 화면에서 확인하세요.</p></div>
+<span class="live">● LIVE　 <i>김</i></span>
+</header>
+
+<section class="panel">
+<div class="head"><div><h2>최근 배포</h2><span>최근 BuildForge 실행 이력</span></div>
+<div class="filters">
+<button class="sel" onclick="filterRows('ALL',this)">전체</button><button onclick="filterRows('RUNNING',this)">진행중</button><button onclick="filterRows('SUCCESS',this)">성공</button><button onclick="filterRows('FAILED',this)">실패</button><button onclick="filterRows('CANCELLED',this)">취소</button>
+</div></div>
+<table><thead><tr><th>시스템</th><th>환경</th><th>Build</th><th>실행자</th><th>시작시간</th><th>소요</th><th>단계</th><th>실패구분</th><th>담당</th><th>상태</th></tr></thead>
+<tbody id="rows"><tr data-status="RUNNING" data-env="운영" onclick="openModal(0)"><td><b>챗봇서비스</b><small>CHATBOT-DEPLOY</small></td><td><em class="env 운영">운영</em></td><td class="mono">CHATBOT-DEPLOY</td><td>김재구</td><td>09/18 14:21:03</td><td class="mono">04:14</td><td>Deploy</td><td>-</td><td class="owner ">-</td><td><em class="badge running">진행중</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(1)"><td><b>고객DB</b><small>CUSTOMER-DB</small></td><td><em class="env 운영">운영</em></td><td class="mono">CUSTOMER-DB</td><td>박민수</td><td>09/18 14:02:11</td><td class="mono">04:37</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="FAILED" data-env="운영" onclick="openModal(2)"><td><b>상담시스템</b><small>COUNSEL-WEB</small></td><td><em class="env 운영">운영</em></td><td class="mono">COUNSEL-WEB</td><td>이영희</td><td>09/18 13:51:24</td><td class="mono">03:44</td><td>Deploy</td><td>인프라</td><td class="owner infra">인프라</td><td><em class="badge failed">실패</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(3)"><td><b>모바일앱 API</b><small>MOBILE-API</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">MOBILE-API</td><td>최준호</td><td>09/18 13:24:09</td><td class="mono">05:22</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(4)"><td><b>인증서비스</b><small>AUTH-SVC</small></td><td><em class="env 운영">운영</em></td><td class="mono">AUTH-SVC</td><td>김수진</td><td>09/18 12:48:51</td><td class="mono">02:41</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="CANCELLED" data-env="개발" onclick="openModal(5)"><td><b>통합로그조회</b><small>LOG-VIEWER</small></td><td><em class="env 개발">개발</em></td><td class="mono">LOG-VIEWER</td><td>정우성</td><td>09/18 11:37:15</td><td class="mono">04:47</td><td>사용자 취소</td><td>-</td><td class="owner ">-</td><td><em class="badge cancelled">취소</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(6)"><td><b>챗봇서비스</b><small>CHATBOT-FIX</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">CHATBOT-FIX</td><td>홍길동</td><td>09/18 10:12:41</td><td class="mono">03:37</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="개발" onclick="openModal(7)"><td><b>고객DB</b><small>CUSTOMER-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">CUSTOMER-DEV</td><td>김민지</td><td>09/18 09:48:22</td><td class="mono">02:18</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(8)"><td><b>상담시스템</b><small>COUNSEL-TEST</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">COUNSEL-TEST</td><td>박준영</td><td>09/18 09:31:08</td><td class="mono">03:02</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="FAILED" data-env="개발" onclick="openModal(9)"><td><b>모바일앱 API</b><small>MOBILE-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">MOBILE-DEV</td><td>최서윤</td><td>09/18 09:05:33</td><td class="mono">02:51</td><td>Build</td><td>배포로직</td><td class="owner infra">인프라</td><td><em class="badge failed">실패</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(10)"><td><b>인증서비스</b><small>AUTH-TEST</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">AUTH-TEST</td><td>이준혁</td><td>09/18 08:42:19</td><td class="mono">01:58</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(11)"><td><b>로그수집서비스</b><small>LOG-COLLECT</small></td><td><em class="env 운영">운영</em></td><td class="mono">LOG-COLLECT</td><td>김지훈</td><td>09/18 08:15:44</td><td class="mono">05:12</td><td>Deploy</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="FAILED" data-env="운영" onclick="openModal(12)"><td><b>고객포털</b><small>PORTAL-WEB</small></td><td><em class="env 운영">운영</em></td><td class="mono">PORTAL-WEB</td><td>오수빈</td><td>09/17 17:52:03</td><td class="mono">06:21</td><td>Verify</td><td>배포로직</td><td class="owner infra">인프라</td><td><em class="badge failed">실패</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(13)"><td><b>결제서비스</b><small>PAYMENT-SVC</small></td><td><em class="env 운영">운영</em></td><td class="mono">PAYMENT-SVC</td><td>강민석</td><td>09/17 17:31:26</td><td class="mono">04:08</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(14)"><td><b>알림서비스</b><small>NOTIFY-TEST</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">NOTIFY-TEST</td><td>한지우</td><td>09/17 16:48:51</td><td class="mono">02:34</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="개발" onclick="openModal(15)"><td><b>데이터배치</b><small>BATCH-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">BATCH-DEV</td><td>윤서준</td><td>09/17 16:22:17</td><td class="mono">07:14</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="CANCELLED" data-env="개발" onclick="openModal(16)"><td><b>상담시스템</b><small>COUNSEL-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">COUNSEL-DEV</td><td>김하늘</td><td>09/17 15:57:39</td><td class="mono">03:26</td><td>사용자 취소</td><td>-</td><td class="owner ">-</td><td><em class="badge cancelled">취소</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(17)"><td><b>모바일앱 API</b><small>MOBILE-API-PRD</small></td><td><em class="env 운영">운영</em></td><td class="mono">MOBILE-API-PRD</td><td>정다은</td><td>09/17 15:24:11</td><td class="mono">05:48</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr><tr data-status="FAILED" data-env="개발" onclick="openModal(18)"><td><b>인증서비스</b><small>AUTH-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">AUTH-DEV</td><td>임도현</td><td>09/17 14:51:44</td><td class="mono">02:11</td><td>Package</td><td>소스/컴파일</td><td class="owner sm">SM</td><td><em class="badge failed">실패</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(19)"><td><b>고객포털</b><small>PORTAL-TEST</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">PORTAL-TEST</td><td>배유진</td><td>09/17 14:18:29</td><td class="mono">04:16</td><td>배포 완료</td><td>-</td><td class="owner ">-</td><td><em class="badge success">성공</em></td></tr></tbody></table>
+</section>
+
+
+</section>
+</main>
+
+<div class="back" id="modal" style="display:none" onclick="closeModal()">
+<div class="modal" onclick="event.stopPropagation()"><button class="close" onclick="closeModal()">×</button>
+<label>DEPLOYMENT DETAIL</label><h2 id="mSystem"></h2>
+<div class="details"><span>배포 ID<b id="mId"></b></span><span>Build<b id="mBuild"></b></span><span>실행자<b id="mExecutor"></b></span><span>대상<b id="mServer"></b></span></div>
+<h3>배포 진행 단계 <em id="mStatus" class="badge"></em></h3>
+<div class="stages" id="mStages"></div>
+<pre id="mLog"></pre>
+</div></div>
+
+<script>
+const data=[["챗봇서비스","운영","CHATBOT-DEPLOY","김재구","09/18 14:21:03","04:14","운영 배포","RUNNING","DEP-20260918-0142"],["고객DB","운영","CUSTOMER-DB","박민수","09/18 14:02:11","04:37","배포 완료","SUCCESS","DEP-20260918-0141"],["상담시스템","운영","COUNSEL-WEB","이영희","09/18 13:51:24","03:44","Deploy","FAILED","DEP-20260918-0140"],["모바일앱 API","테스트","MOBILE-API","최준호","09/18 13:24:09","05:22","배포 완료","SUCCESS","DEP-20260918-0139"],["인증서비스","운영","AUTH-SVC","김수진","09/18 12:48:51","02:41","배포 완료","SUCCESS","DEP-20260918-0138"],["통합로그조회","개발","LOG-VIEWER","정우성","09/18 11:37:15","04:47","사용자 취소","CANCELLED","DEP-20260918-0137"],["챗봇서비스","테스트","CHATBOT-FIX","홍길동","09/18 10:12:41","03:37","배포 완료","SUCCESS","DEP-20260918-0136"],["고객DB","개발","CUSTOMER-DEV","김민지","09/18 09:48:22","02:18","배포 완료","SUCCESS","DEP-20260918-0135"],["상담시스템","테스트","COUNSEL-TEST","박준영","09/18 09:31:08","03:02","배포 완료","SUCCESS","DEP-20260918-0134"],["모바일앱 API","개발","MOBILE-DEV","최서윤","09/18 09:05:33","02:51","Build","FAILED","DEP-20260918-0133"],["인증서비스","테스트","AUTH-TEST","이준혁","09/18 08:42:19","01:58","배포 완료","SUCCESS","DEP-20260918-0132"],["로그수집서비스","운영","LOG-COLLECT","김지훈","09/18 08:15:44","05:12","운영 배포","SUCCESS","DEP-20260918-0131"],["고객포털","운영","PORTAL-WEB","오수빈","09/17 17:52:03","06:21","Verify","FAILED","DEP-20260918-0130"],["결제서비스","운영","PAYMENT-SVC","강민석","09/17 17:31:26","04:08","배포 완료","SUCCESS","DEP-20260918-0129"],["알림서비스","테스트","NOTIFY-TEST","한지우","09/17 16:48:51","02:34","배포 완료","SUCCESS","DEP-20260918-0128"],["데이터배치","개발","BATCH-DEV","윤서준","09/17 16:22:17","07:14","배포 완료","SUCCESS","DEP-20260918-0127"],["상담시스템","개발","COUNSEL-DEV","김하늘","09/17 15:57:39","03:26","사용자 취소","CANCELLED","DEP-20260918-0126"],["모바일앱 API","운영","MOBILE-API-PRD","정다은","09/17 15:24:11","05:48","배포 완료","SUCCESS","DEP-20260918-0125"],["인증서비스","개발","AUTH-DEV","임도현","09/17 14:51:44","02:11","Package","FAILED","DEP-20260918-0124"],["고객포털","테스트","PORTAL-TEST","배유진","09/17 14:18:29","04:16","배포 완료","SUCCESS","DEP-20260918-0123"]];
+const labels={RUNNING:"진행중",SUCCESS:"성공",FAILED:"실패",CANCELLED:"취소"};
+function filterRows(status,btn){document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("sel"));btn.classList.add("sel");document.querySelectorAll("#rows tr").forEach(r=>r.style.display=status==="ALL"||r.dataset.status===status?"":"none")}
+function openModal(i){
+ const d=data[i];
+ document.getElementById("mSystem").textContent=d[0];
+ document.getElementById("mId").textContent=d[8];
+ document.getElementById("mBuild").textContent=d[2];
+ document.getElementById("mExecutor").textContent=d[3];
+ document.getElementById("mServer").textContent=d[0]+" / "+d[1];
+ const s=document.getElementById("mStatus");s.textContent=labels[d[7]];s.className="badge "+d[7].toLowerCase();
+ const stages=["Checkout","Build","Package","Deploy","Verify"];
+ document.getElementById("mStages").innerHTML=stages.map((x,n)=>`<div class="${d[7]==="SUCCESS"||n<3?"done":d[7]==="FAILED"&&x===d[6]?"fail":""}">${n+1}<b>${x}</b></div>`).join("");
+ document.getElementById("mLog").textContent=`[${d[4].slice(6)}] Build started
+[${d[4].slice(6)}] Source checkout completed
+[14:22:31] Build completed successfully
+[14:23:04] Package created
+[14:24:11] Deploying to ${d[0]} (${d[1]})
+[14:25:17] Deployment status: ${labels[d[7]]}`;
+ document.getElementById("modal").style.display="grid";
+}
+function closeModal(){document.getElementById("modal").style.display="none"}
+</script>
+</body>
+</html>
