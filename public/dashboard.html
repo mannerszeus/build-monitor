@@ -1,10 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Build Monitor</title>
-<style>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Build Monitor</title><style>
 *{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#182234;font-family:Arial,"Noto Sans KR",sans-serif}
 .shell{min-height:100vh;display:flex}.sidebar{width:240px;background:#101827;color:white;padding:26px 16px;display:flex;flex-direction:column}
 .brand{display:flex;gap:11px;align-items:center;padding:0 10px 35px}.brand>b{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#7dd3fc,#a78bfa);font-size:20px}
@@ -31,81 +26,14 @@ td b{display:block;color:#263247}td small{display:block;color:#a0a8b5;font-size:
 .env.개발{background:#f0ecff;color:#7562b4}.env.테스트{background:#e8f5ff;color:#3984b0}.env.운영{background:#e8f7ed;color:#3e926c}
 table{table-layout:fixed}th:nth-child(1){width:17%}th:nth-child(2){width:8%}th:nth-child(3){width:17%}th:nth-child(4){width:10%}th:nth-child(5){width:15%}th:nth-child(6){width:8%}th:nth-child(7){width:15%}th:nth-child(8){width:10%}
 td,th{white-space:nowrap}td{padding:9px 12px;font-size:10px}th{padding:9px 12px}.panel .head{padding:16px 20px}
-</style>
-<style>
-/* Build Monitor v2 operational dashboard */
-.ops-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 14px}
-.ops-card{background:#151a23;border:1px solid #252c38;border-radius:10px;padding:12px 14px;min-height:72px}
-.ops-card .label{font-size:12px;color:#8d98aa}.ops-card .num{font-size:24px;font-weight:750;margin-top:5px}.ops-card.warn .num{color:#ffb84d}.ops-card.danger .num{color:#ff6b6b}
-.attention{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.att-box{background:#151a23;border:1px solid #252c38;border-radius:10px;padding:12px 14px}.att-title{font-weight:700;font-size:13px;margin-bottom:8px}.att-item{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #252c38;font-size:12px}.att-item:first-of-type{border-top:0}.att-meta{color:#8d98aa}.owner{font-weight:700}
-.mini-schedule{margin-top:14px;background:#151a23;border:1px solid #252c38;border-radius:10px;padding:12px 14px}.mini-schedule h3{font-size:13px;margin:0 0 8px}.schedule-row{display:grid;grid-template-columns:1.5fr .6fr .8fr .8fr .7fr;gap:8px;padding:7px 0;border-top:1px solid #252c38;font-size:12px}.schedule-row.head{color:#8d98aa;border-top:0}.schedule-ok{color:#6ee7a0}.schedule-warn{color:#ffb84d}
-.status{display:inline-flex;align-items:center;gap:5px}.status.wait{color:#f4c95d}.status.run{color:#6bb7ff}.status.success{color:#6ee7a0}.status.fail{color:#ff6b6b}.status.cancel{color:#aab3c2}
-.env.dev{background:#33265d;color:#cdb8ff}.env.test{background:#163c5b;color:#8fd0ff}.env.prod{background:#16452f;color:#85e0ad}
-.owner.infra{color:#ffb84d}.owner.sm{color:#8fd0ff}
-@media(max-width:900px){.ops-summary{grid-template-columns:repeat(2,1fr)}.attention{grid-template-columns:1fr}.schedule-row{grid-template-columns:1.4fr .6fr .8fr .8fr}}
-</style>
 
-</head>
-<body>
-<main class="shell">
-<aside class="sidebar">
-<div class="brand"><b>B</b><div><strong>Build Monitor</strong><small>BuildForge Operations</small></div></div>
-<nav>
-<button class="active">▦　대시보드</button><button>↻　배포 이력</button><button>▣　시스템 현황</button><button>⚙　설정</button>
-</nav>
-<footer>● Collector 연결 대기중<br><small>UI Preview · Dummy Data</small></footer>
-</aside>
-
-<section class="content">
-<header>
-<div><label>OPERATIONS / DEPLOYMENT</label><h1>배포 현황</h1><p>BuildForge 배포 작업을 한 화면에서 확인하세요.</p></div>
-<span class="live">● LIVE　 <i>김</i></span>
-</header>
-
-<section class="panel">
-<div class="head"><div><h2>최근 배포</h2><span>최근 BuildForge 실행 이력</span></div>
-<div class="filters"><button class="sel" onclick="filterRows('ALL',this)">전체</button><button onclick="filterRows('RUNNING',this)">진행중</button><button onclick="filterRows('DONE',this)">완료</button></div></div>
-<table><thead><tr><th>시스템</th><th>환경</th><th>Build</th><th>실행자</th><th>시작시간</th><th>소요</th><th>단계</th><th>상태</th></tr></thead>
-<tbody id="rows"><tr data-status="RUNNING" data-env="운영" onclick="openModal(0)"><td><b>챗봇서비스</b><small>CHATBOT-DEPLOY</small></td><td><em class="env 운영">운영</em></td><td class="mono">CHATBOT-DEPLOY</td><td>김재구</td><td>09/18 14:21:03</td><td class="mono">04:14</td><td>Deploy</td><td><em class="badge running">진행중</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(1)"><td><b>고객DB</b><small>CUSTOMER-DB</small></td><td><em class="env 운영">운영</em></td><td class="mono">CUSTOMER-DB</td><td>박민수</td><td>09/18 14:02:11</td><td class="mono">04:37</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="FAILED" data-env="운영" onclick="openModal(2)"><td><b>상담시스템</b><small>COUNSEL-WEB</small></td><td><em class="env 운영">운영</em></td><td class="mono">COUNSEL-WEB</td><td>이영희</td><td>09/18 13:51:24</td><td class="mono">03:44</td><td>Deploy</td><td><em class="badge failed">실패</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(3)"><td><b>모바일앱 API</b><small>MOBILE-API</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">MOBILE-API</td><td>최준호</td><td>09/18 13:24:09</td><td class="mono">05:22</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(4)"><td><b>인증서비스</b><small>AUTH-SVC</small></td><td><em class="env 운영">운영</em></td><td class="mono">AUTH-SVC</td><td>김수진</td><td>09/18 12:48:51</td><td class="mono">02:41</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="CANCELLED" data-env="개발" onclick="openModal(5)"><td><b>통합로그조회</b><small>LOG-VIEWER</small></td><td><em class="env 개발">개발</em></td><td class="mono">LOG-VIEWER</td><td>정우성</td><td>09/18 11:37:15</td><td class="mono">04:47</td><td>사용자 취소</td><td><em class="badge cancelled">취소</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(6)"><td><b>챗봇서비스</b><small>CHATBOT-FIX</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">CHATBOT-FIX</td><td>홍길동</td><td>09/18 10:12:41</td><td class="mono">03:37</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="개발" onclick="openModal(7)"><td><b>고객DB</b><small>CUSTOMER-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">CUSTOMER-DEV</td><td>김민지</td><td>09/18 09:48:22</td><td class="mono">02:18</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(8)"><td><b>상담시스템</b><small>COUNSEL-TEST</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">COUNSEL-TEST</td><td>박준영</td><td>09/18 09:31:08</td><td class="mono">03:02</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="FAILED" data-env="개발" onclick="openModal(9)"><td><b>모바일앱 API</b><small>MOBILE-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">MOBILE-DEV</td><td>최서윤</td><td>09/18 09:05:33</td><td class="mono">02:51</td><td>Build</td><td><em class="badge failed">실패</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(10)"><td><b>인증서비스</b><small>AUTH-TEST</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">AUTH-TEST</td><td>이준혁</td><td>09/18 08:42:19</td><td class="mono">01:58</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(11)"><td><b>로그수집서비스</b><small>LOG-COLLECT</small></td><td><em class="env 운영">운영</em></td><td class="mono">LOG-COLLECT</td><td>김지훈</td><td>09/18 08:15:44</td><td class="mono">05:12</td><td>Deploy</td><td><em class="badge success">성공</em></td></tr><tr data-status="FAILED" data-env="운영" onclick="openModal(12)"><td><b>고객포털</b><small>PORTAL-WEB</small></td><td><em class="env 운영">운영</em></td><td class="mono">PORTAL-WEB</td><td>오수빈</td><td>09/17 17:52:03</td><td class="mono">06:21</td><td>Verify</td><td><em class="badge failed">실패</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(13)"><td><b>결제서비스</b><small>PAYMENT-SVC</small></td><td><em class="env 운영">운영</em></td><td class="mono">PAYMENT-SVC</td><td>강민석</td><td>09/17 17:31:26</td><td class="mono">04:08</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(14)"><td><b>알림서비스</b><small>NOTIFY-TEST</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">NOTIFY-TEST</td><td>한지우</td><td>09/17 16:48:51</td><td class="mono">02:34</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="SUCCESS" data-env="개발" onclick="openModal(15)"><td><b>데이터배치</b><small>BATCH-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">BATCH-DEV</td><td>윤서준</td><td>09/17 16:22:17</td><td class="mono">07:14</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="CANCELLED" data-env="개발" onclick="openModal(16)"><td><b>상담시스템</b><small>COUNSEL-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">COUNSEL-DEV</td><td>김하늘</td><td>09/17 15:57:39</td><td class="mono">03:26</td><td>사용자 취소</td><td><em class="badge cancelled">취소</em></td></tr><tr data-status="SUCCESS" data-env="운영" onclick="openModal(17)"><td><b>모바일앱 API</b><small>MOBILE-API-PRD</small></td><td><em class="env 운영">운영</em></td><td class="mono">MOBILE-API-PRD</td><td>정다은</td><td>09/17 15:24:11</td><td class="mono">05:48</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr><tr data-status="FAILED" data-env="개발" onclick="openModal(18)"><td><b>인증서비스</b><small>AUTH-DEV</small></td><td><em class="env 개발">개발</em></td><td class="mono">AUTH-DEV</td><td>임도현</td><td>09/17 14:51:44</td><td class="mono">02:11</td><td>Package</td><td><em class="badge failed">실패</em></td></tr><tr data-status="SUCCESS" data-env="테스트" onclick="openModal(19)"><td><b>고객포털</b><small>PORTAL-TEST</small></td><td><em class="env 테스트">테스트</em></td><td class="mono">PORTAL-TEST</td><td>배유진</td><td>09/17 14:18:29</td><td class="mono">04:16</td><td>배포 완료</td><td><em class="badge success">성공</em></td></tr></tbody></table>
-</section>
-
-
-</section>
-</main>
-
-<div class="back" id="modal" style="display:none" onclick="closeModal()">
-<div class="modal" onclick="event.stopPropagation()"><button class="close" onclick="closeModal()">×</button>
-<label>DEPLOYMENT DETAIL</label><h2 id="mSystem"></h2>
-<div class="details"><span>배포 ID<b id="mId"></b></span><span>Build<b id="mBuild"></b></span><span>실행자<b id="mExecutor"></b></span><span>대상<b id="mServer"></b></span></div>
-<h3>배포 진행 단계 <em id="mStatus" class="badge"></em></h3>
-<div class="stages" id="mStages"></div>
-<pre id="mLog"></pre>
-</div></div>
-
-<script>
-const data=[["챗봇서비스","운영","CHATBOT-DEPLOY","김재구","09/18 14:21:03","04:14","운영 배포","RUNNING","DEP-20260918-0142"],["고객DB","운영","CUSTOMER-DB","박민수","09/18 14:02:11","04:37","배포 완료","SUCCESS","DEP-20260918-0141"],["상담시스템","운영","COUNSEL-WEB","이영희","09/18 13:51:24","03:44","Deploy","FAILED","DEP-20260918-0140"],["모바일앱 API","테스트","MOBILE-API","최준호","09/18 13:24:09","05:22","배포 완료","SUCCESS","DEP-20260918-0139"],["인증서비스","운영","AUTH-SVC","김수진","09/18 12:48:51","02:41","배포 완료","SUCCESS","DEP-20260918-0138"],["통합로그조회","개발","LOG-VIEWER","정우성","09/18 11:37:15","04:47","사용자 취소","CANCELLED","DEP-20260918-0137"],["챗봇서비스","테스트","CHATBOT-FIX","홍길동","09/18 10:12:41","03:37","배포 완료","SUCCESS","DEP-20260918-0136"],["고객DB","개발","CUSTOMER-DEV","김민지","09/18 09:48:22","02:18","배포 완료","SUCCESS","DEP-20260918-0135"],["상담시스템","테스트","COUNSEL-TEST","박준영","09/18 09:31:08","03:02","배포 완료","SUCCESS","DEP-20260918-0134"],["모바일앱 API","개발","MOBILE-DEV","최서윤","09/18 09:05:33","02:51","Build","FAILED","DEP-20260918-0133"],["인증서비스","테스트","AUTH-TEST","이준혁","09/18 08:42:19","01:58","배포 완료","SUCCESS","DEP-20260918-0132"],["로그수집서비스","운영","LOG-COLLECT","김지훈","09/18 08:15:44","05:12","운영 배포","SUCCESS","DEP-20260918-0131"],["고객포털","운영","PORTAL-WEB","오수빈","09/17 17:52:03","06:21","Verify","FAILED","DEP-20260918-0130"],["결제서비스","운영","PAYMENT-SVC","강민석","09/17 17:31:26","04:08","배포 완료","SUCCESS","DEP-20260918-0129"],["알림서비스","테스트","NOTIFY-TEST","한지우","09/17 16:48:51","02:34","배포 완료","SUCCESS","DEP-20260918-0128"],["데이터배치","개발","BATCH-DEV","윤서준","09/17 16:22:17","07:14","배포 완료","SUCCESS","DEP-20260918-0127"],["상담시스템","개발","COUNSEL-DEV","김하늘","09/17 15:57:39","03:26","사용자 취소","CANCELLED","DEP-20260918-0126"],["모바일앱 API","운영","MOBILE-API-PRD","정다은","09/17 15:24:11","05:48","배포 완료","SUCCESS","DEP-20260918-0125"],["인증서비스","개발","AUTH-DEV","임도현","09/17 14:51:44","02:11","Package","FAILED","DEP-20260918-0124"],["고객포털","테스트","PORTAL-TEST","배유진","09/17 14:18:29","04:16","배포 완료","SUCCESS","DEP-20260918-0123"]];
-const labels={RUNNING:"진행중",SUCCESS:"성공",FAILED:"실패",CANCELLED:"취소"};
-function filterRows(status,btn){document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("sel"));btn.classList.add("sel");document.querySelectorAll("#rows tr").forEach(r=>r.style.display=status==="ALL"||r.dataset.status===status||(status==="DONE"&&["SUCCESS","FAILED","CANCELLED"].includes(r.dataset.status))?"":"none")}
-function openModal(i){
- const d=data[i];
- document.getElementById("mSystem").textContent=d[0];
- document.getElementById("mId").textContent=d[8];
- document.getElementById("mBuild").textContent=d[2];
- document.getElementById("mExecutor").textContent=d[3];
- document.getElementById("mServer").textContent=d[0]+" / "+d[1];
- const s=document.getElementById("mStatus");s.textContent=labels[d[7]];s.className="badge "+d[7].toLowerCase();
- const stages=["Checkout","Build","Package","Deploy","Verify"];
- document.getElementById("mStages").innerHTML=stages.map((x,n)=>`<div class="${d[7]==="SUCCESS"||n<3?"done":d[7]==="FAILED"&&x===d[6]?"fail":""}">${n+1}<b>${x}</b></div>`).join("");
- document.getElementById("mLog").textContent=`[${d[4].slice(6)}] Build started
-[${d[4].slice(6)}] Source checkout completed
-[14:22:31] Build completed successfully
-[14:23:04] Package created
-[14:24:11] Deploying to ${d[0]} (${d[1]})
-[14:25:17] Deployment status: ${labels[d[7]]}`;
- document.getElementById("modal").style.display="grid";
-}
-function closeModal(){document.getElementById("modal").style.display="none"}
-</script>
-</body>
-</html>
+button,input,select{font:inherit}button,.file-button{cursor:pointer;border:1px solid #cbd5e1;background:white;color:#273247;padding:9px 12px;border-radius:8px}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #3887bb;outline-offset:2px}.toolbar,.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.tabs .active{background:#1d293b;color:white}.toolbar input[type=search]{flex:1;min-width:180px}.toolbar input,.toolbar select{padding:10px;border:1px solid #cbd5e1;border-radius:8px}#source{padding:12px 0;font-size:12px;color:#536074}#source.stale,#error{color:#b42318}#error{padding:12px;background:#fff2f2;border-radius:8px;margin-bottom:14px}#results{overflow:auto;max-height:65vh}table{min-width:940px}td,th{white-space:normal;overflow-wrap:anywhere}.empty{padding:28px;color:#697589}.statistics{padding:24px}.stat-line{display:grid;grid-template-columns:90px 70px 1fr;gap:12px;margin-bottom:14px;align-items:center}progress{width:100%;height:16px}.row-button{border:0;background:none;padding:0;font-weight:700;text-align:left;color:#263247}dialog.modal{border:0;max-height:85vh;overflow:auto}dialog::backdrop{background:#11182788}#mLog{max-height:38vh;overflow:auto}#mStages{font-size:12px;color:#697589}.file-button{position:relative}.file-button input{position:absolute;width:1px;height:1px;opacity:0}.file-button:focus-within{outline:3px solid #3887bb;outline-offset:2px}header{gap:16px}header .toolbar{justify-content:flex-end}.unknown{background:#fff5d8;color:#8c6417}.env.미확인{background:#f0f1f3;color:#7c8491}@media(max-width:700px){header{display:block}.content{padding:16px}h1{font-size:24px}header .toolbar{justify-content:flex-start;margin-top:15px}.tabs button{flex:1;white-space:nowrap;font-size:12px}.stats{gap:8px}.card{padding:12px}.modal{padding:18px}.details{grid-template-columns:1fr 1fr}}
+</style><script defer src="dashboard-model.js"></script><script defer src="dashboard.js"></script></head>
+<body><main class="shell"><aside class="sidebar"><div class="brand"><b>B</b><div><strong>Build Monitor</strong><small>BuildForge Operations</small></div></div><p>배포 상태 · 실행 이력 · 로그</p><footer>JSON 스냅샷 모니터<br><small>실제 연동 전에는 예제 또는 파일 데이터를 사용합니다.</small></footer></aside>
+<section class="content"><header><div><label>OPERATIONS / DEPLOYMENT</label><h1>배포 모니터링</h1><p>수집된 실행 상태를 확인하세요.</p></div><div class="toolbar"><label class="file-button">JSON 파일 열기<input id="import" type="file" accept=".json,application/json"></label><button id="demo">예제 보기</button><button id="connect">사내 스냅샷 연결</button></div></header>
+<div id="source" role="status" aria-live="polite"></div><div id="error" role="alert" hidden></div>
+<section class="stats" aria-label="스냅샷 통계"><div class="card blue"><span>현재 스냅샷</span><strong id="total">0</strong></div><div class="card purple"><span>진행 중</span><strong id="running">0</strong></div><div class="card red"><span>실패</span><strong id="failed">0</strong></div><div class="card green"><span>완료 건 성공률</span><strong id="rate">—</strong></div></section>
+<nav class="tabs" aria-label="모니터링 메뉴"><button class="active" data-view="recent">최근 배포 20개</button><button data-view="running">진행 중</button><button data-view="systems">시스템 현황</button><button data-view="stats">통계·분석</button><button data-view="logs">로그 조회</button></nav>
+<div class="toolbar"><select id="environment" aria-label="환경"><option value="ALL">전체 환경</option><option>개발</option><option>테스트</option><option>운영</option><option>미확인</option></select><select id="status" aria-label="상태"><option value="ALL">전체 상태</option><option value="RUNNING">진행 중</option><option value="SUCCESS">성공</option><option value="FAILED">실패</option><option value="CANCELLED">취소</option><option value="UNKNOWN">미확인</option></select><input id="search" type="search" aria-label="배포·로그 검색" placeholder="시스템, 프로젝트, 실행자, 실행 ID, 로그 검색"></div>
+<section class="panel"><div class="head"><div><h2 id="viewTitle">최근 배포</h2><span id="summary"></span></div><span>시스템명을 누르면 상세·로그를 볼 수 있습니다.</span></div><div id="results"></div></section></section></main>
+<dialog class="modal" id="modal" aria-labelledby="mSystem"><button class="close" id="close" aria-label="상세 닫기">×</button><label>DEPLOYMENT DETAIL</label><h2 id="mSystem"></h2><div class="details"><span>실행 ID<b id="mId"></b></span><span>프로젝트<b id="mBuild"></b></span><span>실행자<b id="mExecutor"></b></span><span>환경<b id="mServer"></b></span></div><h3>수집된 상태 <em id="mStatus" class="badge"></em></h3><div id="mStages"></div><pre id="mLog"></pre></dialog></body></html>
