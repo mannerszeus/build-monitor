@@ -1,8 +1,34 @@
 # AI 협업 Core Workflow
 
 ```text
-사용자 요구 → AI-LEAD(ChatGPT) → Issue → 영향도 분석 → Branch → AI-CODE(Codex) / DBA / UX → PR → AI-REVIEW(Copilot 등) → AI-TEST(Playwright/Actions) → Quality Gate → AI-AUDIT(PR 증거) → 사람 승인 → Merge → AI-RELEASE → Deployment READY → Production URL → Production Smoke → AI-AUDIT(Release 증거) → 문서 현행화/Issue 종료 준비 → AI-AUDIT(DONE 확인) → AI-LEAD의 Issue Close/완료 보고
+사용자 요구 → 협업 규칙 사전 확인 → AI-LEAD(ChatGPT) → Issue → 영향도 분석 → Branch → AI-CODE(Codex) / DBA / UX → PR → AI-REVIEW(Copilot 등) → AI-TEST(Playwright/Actions) → Quality Gate → AI-AUDIT(PR 증거) → 사람 승인 → Merge → AI-RELEASE → Deployment READY → Production URL → Production Smoke → AI-AUDIT(Release 증거) → 문서 현행화/Issue 종료 준비 → AI-AUDIT(DONE 확인) → AI-LEAD의 Issue Close/완료 보고
 ```
+
+## 작업 시작 점검
+- 새 작업에서 변경하거나 Issue/PR을 만들기 전에 현재 기본 브랜치의 중앙 Core Workflow, AI_COLLABORATION, TASKS 및 필요한 역할 문서와 프로젝트 고유 규칙을 확인한다. AGENTS.md, .ai/project/PROJECT_RULES.md, 프로젝트 .ai/WORKFLOW.md가 없으면 부재를 기록하고 확인 가능한 규칙을 적용한다.
+- 작업 의도(조회/수정/배포), Issue, 대상 ref, 영향 범위, 위험도, 담당 역할, Review/Test/Release 및 사용자 승인 지점을 Issue/PR의 CODEX ANALYSIS에 기록한다. 단순 상태 조회에는 새 Issue나 runner를 요구하지 않는다.
+- 같은 작업에서 같은 ref·동일 문서를 확인했다면 재사용한다. 새 작업, 규칙/ref 변경, 범위 확대 시 관련 문서만 재확인한다.
+- 중앙 정책과 프로젝트별 조건의 차이는 기록한다. 프로젝트의 구체적인 조건을 적용하되 독립 리뷰·필수 검증·사용자 승인·감리 Gate를 완화하지 않는다. 모순이 남으면 Merge 전에 해결한다.
+
+## 사용자 머지 승인
+- 현재 PR의 변경 범위, HEAD SHA, 관련 리뷰/검증, 배포·동기화 영향 및 UNKNOWN을 제시해 명시적 머지 승인을 받은 뒤 Merge한다. 구현 진행 요청은 검증된 PR의 머지 승인이 아니다.
+- 승인 대상 SHA·범위와 사용자 승인 내용을 PR/Issue에 기록한다. 변경 파일이나 범위가 달라지면 이전 승인을 적용하지 않는다.
+- 사용자가 같은 수정본의 develop/main 반영·운영 검증까지 명시적으로 승인한 경우에는 그 범위에서 재승인을 요구하지 않는다. Merge commit SHA만 바뀌고 승인된 파일 tree와 범위가 같으면 승인 연결 근거를 기록한다.
+- CI PASS, AI 리뷰, GitHub 권한은 사용자 승인을 대신하지 않는다. 자동 배포나 Framework consumer Update PR 생성은 승인 시 영향을 함께 알린다.
+- Branch Protection/Ruleset은 계정·플랜에서 지원되는 조건을 확인한 후 적용한다. 확인·설정하지 못한 항목은 UNKNOWN/미적용으로 기록하며 운영상의 승인 Gate는 유지한다.
+
+## Codex 분석과 인계
+- AI-CODE는 구현 전에 CODEX ANALYSIS, 완료 후 CODEX HANDOFF를 Issue/PR에 기록한다. 필수 항목은 .ai/core/HANDOFF.md를 따른다.
+- 실제 분석/테스트 실행 결과와 출처·대상 SHA를 기록한다. 본문 마커의 존재만으로 Codex 실행, 독립 리뷰 또는 테스트 PASS를 인정하지 않는다.
+- 문서/Framework-only에는 관련 정적 검증을 적용하고 앱 E2E/배포는 유형별 기준에 따른다. 분석·인계 기록만을 검사하기 위한 새 runner 또는 전수 리뷰를 기본 요구하지 않는다.
+
+## 최종 HEAD 리뷰
+- 위험도상 독립 리뷰가 필요한 변경은 구현·관련 검증·필요한 CI 수정 완료 후 최종 HEAD에서 Copilot 리뷰 기본 1회를 사용한다. LOW의 기본 생략 정책은 유지한다.
+- 자동 리뷰가 이미 시작됐거나 유효한 동일 SHA 결과가 있으면 수동 요청하지 않는다. 결과·대상 SHA·미해결 지적을 실제 GitHub 증거와 대조한다.
+- 실제 결함을 수정해 HEAD가 바뀌면 변경 영향 검증과 필요한 새 HEAD 리뷰를 기본 1회 수행한다. 과거 SHA 또는 같은 tree라는 이유만으로 현재 HEAD의 필수 리뷰를 대신하지 않는다.
+- quota-limit/권한 오류/실행 실패 알림은 리뷰가 아니다. UNKNOWN/BLOCKED로 기록하고 동일 오류에 반복 요청하지 않는다. 대체 독립 리뷰는 .ai/roles/REVIEW.md의 현재 HEAD·별도 협업자 기준을 따른다.
+- 자동 신규 PR 리뷰/매 push 재리뷰는 비용 최소화를 위해 기본 비활성 운영 정책으로 한다. 실제 관리자 설정을 확인하거나 변경하지 못했다면 UNKNOWN이며 문서 반영을 설정 완료로 표시하지 않는다. 자동 실행이 확인되면 해당 실행을 재사용한다.
+- Copilot COMMENTED는 본문과 지적을 대조하면 리뷰 증거가 될 수 있으나 사용자의 머지 승인과 별개다.
 
 ## 상태 승격 기준
 | 상태 | 기준 |
