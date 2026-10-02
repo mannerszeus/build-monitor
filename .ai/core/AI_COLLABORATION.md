@@ -22,7 +22,10 @@
 | AI-UX | UI/반응형/접근성 | 화면 검증 + E2E |
 | AI-REVIEW | 버그/보안/회귀/성능 | Review 결과 |
 | AI-TEST | E2E/CI/Smoke | 실제 PASS |
-| AI-RELEASE | Merge/Deployment/Production | READY + Smoke |
+| AI-RELEASE | Merge/Deployment/Production | 변경 유형별 Release 증거(`.ai/roles/RELEASE.md`) |
+| AI-AUDIT | 단계별 절차·증거·SHA 일치 대조 | PR/Release/DONE 판정(PASS/BLOCKED/UNKNOWN) |
+
+감리는 독립 코드 리뷰나 테스트를 대신하지 않으며, AI-LEAD는 PR/Release/DONE 판정과 실제 증거를 확인한 뒤 최종 상태를 판단한다. 최종 감리는 문서 현행화 후 Issue 종료·완료 보고 전에 수행한다. 배포/Smoke 증거는 적용 대상에만 요구하고, 비적용 항목은 N/A와 사유를 기록한다. 필수 증거의 실패·공백은 N/A로 대체하지 않는다.
 
 ## 상태 Gate
 `PLANNED → ANALYZED → IMPLEMENTED → REVIEWED → TESTED → MERGED → DEPLOYED → PRODUCTION_VERIFIED → DONE`
@@ -46,3 +49,5 @@ DB Schema/RLS/Auth/Migration, 대량 데이터, Production 설정, Secret/환경
 - 이 Core는 Framework Version을 기준으로 소비 프로젝트에 배포된다.
 - 소비 프로젝트의 프로젝트 고유 규칙은 동기화 대상이 아니다.
 - Framework 변경은 자동 Update PR로 제안하고 사람의 Merge 승인을 거친다.
+
+상태 Gate는 변경 유형별 적용 대상에만 사용한다. 비적용 배포/운영 상태는 N/A와 사유를 기록하며, 필수 검증의 미확인 상태는 UNKNOWN으로 남긴다. 상세 Release 증거는 `.ai/roles/RELEASE.md`를 따른다.
