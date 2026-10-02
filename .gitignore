@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.data/
+snapshot.json
+public/snapshot.json
+*.har
+*.cookies
+.env*
+!.env.example
